@@ -15,7 +15,7 @@ export class AuthController {
         if (AuthController.localHostTesting) {
             res.redirect('https://discord.com/api/oauth2/authorize?client_id=1002031029080563732&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F%40enoro%2Fauth%2Fdiscord&response_type=code&scope=identify');
         } else {
-            res.redirect('https://discord.com/api/oauth2/authorize?client_id=1002031029080563732&redirect_uri=https%3A%2F%2Fcloudapi-node.vercel.com%2F%40enoro%2Fauth%2Fdiscord&response_type=code&scope=identify');
+            res.redirect('https://discord.com/api/oauth2/authorize?client_id=1002031029080563732&redirect_uri=https%3A%2F%2Fcloudapi-node.vercel.app%2F%40enoro%2Fauth%2Fdiscord&response_type=code&scope=identify');
         }
     }
 
