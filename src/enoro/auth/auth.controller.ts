@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { Body, Controller, Get, Param, Query, Res } from "@nestjs/common";
 import axios from "axios";
 import * as url from 'url';
