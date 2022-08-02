@@ -64,6 +64,10 @@ export class UserService {
         }
     }
 
+    public async updatePassword({ id, username }: UsersFindQuery, password: string): Promise<UserResponse> {
+        return this.update({ id, username }, { password: Security.generateSHA256(password) });
+    }
+
     /**
      * Checks for password matches.
      */
