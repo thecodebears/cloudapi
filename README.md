@@ -15,8 +15,13 @@ Make sure to initialize local environment variables by managing .env file.
 # Server domain
 hostname=
 
-# Main database connection
-databaseURI=
+# Main database credentials
+databaseHost=
+databaseName=
+databasePort=
+databaseUsername=
+databasePassword=
+useSSL=false
 
 # Main Discord application
 # In most cases used for authorization
