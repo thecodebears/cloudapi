@@ -4,13 +4,13 @@ import { Security } from "src/utils/security";
 import { FindOptionsWhere, Repository } from "typeorm";
 import { ClientResponse } from "./client.codes";
 import { Client } from "./client.entity";
-import { ClientsFindQuery } from "./client.types";
+import { ClientAuthParameters, ClientsFindQuery, ClientType } from "./client.types";
 
 @Injectable()
 export class ClientService {
     constructor(@InjectRepository(Client) private clientsRepository: Repository<Client>) {}
 
-    public async create(type: string, instance: string): Promise<Client> {
+    public async create(type: ClientType, instance: string): Promise<Client> {
         let client = await this.clientsRepository.create({
             type,
             instance,
@@ -37,5 +37,17 @@ export class ClientService {
 
     public async findOneBy({ id, token, instance }: ClientsFindQuery): Promise<Client> {
         return this.clientsRepository.findOne({ where: [ { id }, { token }, { instance } ] })
+    }
+
+    public async authorize(token: string): Promise<ClientAuthParameters | ClientResponse> {
+        let client = await this.findOneBy({ token });
+        if (client) {
+            return {
+                type: client.type,
+                instance: client.instance
+            } as ClientAuthParameters;
+        } else {
+            return ClientResponse.NotFound;
+        }
     }
 }
