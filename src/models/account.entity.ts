@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { BaseEntity } from "../base.entity";
+import { BaseEntity } from "./base.entity";
 
 @Entity()
 export class Account extends BaseEntity {
@@ -9,6 +9,6 @@ export class Account extends BaseEntity {
     @Column({ type: 'varchar' })
     public name: string;
 
-    @Column({ type: 'boolean' })
+    @Column({ type: 'boolean', nullable: true })
     public developer: boolean;
 }
