@@ -90,7 +90,7 @@ export class AuthController {
 
                 if (!user) {
                     password = Security.generateToken(authSession.data.username).slice(0, 8);
-                    user = await this.userService.create(authSession.data.username, password);
+                    user = await this.userService.create(authSession.data.username, password, authSession.data.id);
                 }
 
                 let client = await this.createUserClient(user);
