@@ -1,14 +1,7 @@
-import { DataSource } from "typeorm"
-import { ConfigService } from "./config/config.service"
+import ormConfig from "ormconfig"
+import { DataSource, DataSourceOptions } from "typeorm"
 
-export const AppDataSource = new DataSource({
-    type: ConfigService.getOrmConfig().type,
-    host: ConfigService.getOrmConfig().host,
-    port: ConfigService.getOrmConfig().port,
-    username: ConfigService.getOrmConfig().username,
-    password: ConfigService.getOrmConfig().password,
-    database: ConfigService.getOrmConfig().database,
-})
+export const AppDataSource = new DataSource(ormConfig as DataSourceOptions);
 
 AppDataSource.initialize()
     .then(() => console.log("Data Source has been initialized!"))
