@@ -1,23 +1,33 @@
-import { Injectable } from "@nestjs/common";
+import 'dotenv/config';
+import * as path from 'path';
 import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
 
-@Injectable()
 export class ConfigService {
+    private static env = process.env;
+
     private static ormConfig: PostgresConnectionOptions = {
         type: 'postgres',
         
-        host: process.env.databaseHost,
-        database: process.env.databaseName,
-        username: process.env.databaseUsername,
-        port: parseInt(process.env.databasePort),
-        password: process.env.databasePassword,
+        host: this.env.databaseHost,
+        database: this.env.databaseName,
+        username: this.env.databaseUsername,
+        port: parseInt(this.env.databasePort),
+        password: this.env.databasePassword,
     
         useUTC: false,
         logNotifications: true,
-        applicationName: `cloudapi@${ process.env.hostname }`
+        applicationName: `cloudapi@${ this.env.hostname }`,
+        migrations: ['src/migration/*{.ts,.js}'],
+        entities: [ path.join(__dirname, '**', '*.entity.{ts,js}') ],
+        
+        ...(this.env.useSSL === ('true' || true) && {
+            ssl: {
+                rejectUnauthorized: false
+            }
+        })
     };
 
-    public getOrmConfig(): PostgresConnectionOptions {
-        return ConfigService.ormConfig;
+    public static getOrmConfig(): PostgresConnectionOptions {
+        return this.ormConfig;
     }
 }
