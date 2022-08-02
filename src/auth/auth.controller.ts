@@ -66,7 +66,7 @@ export class AuthController {
 
                 let authSession = this.authService.createAuthSession('discord', userRequest.data);
     
-                res.redirect(`${ config.hostname }/auth/register?sessionKey=${ authSession }`);
+                res.redirect(`${ config.hostname }/auth?sessionKey=${ authSession }`);
             } catch(e) {
                 console.log(e);
             }
@@ -75,7 +75,7 @@ export class AuthController {
         }
     }
 
-    @Get('register')
+    @Get()
     public async register(
         @Query('sessionKey') sessionKey: string,
         @Query('username') username: string,
@@ -97,6 +97,7 @@ export class AuthController {
 
                 return {
                     token: client.token,
+                    username: user.username,
                     ...(password && { password })
                 };
             } else if (authSession.type === 'raw') {
