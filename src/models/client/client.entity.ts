@@ -1,7 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "../base.entity";
-
-type ClientType = 'user' | 'application';
+import { ClientType } from "./client.types";
 
 @Entity()
 export class Client extends BaseEntity {
@@ -9,7 +8,7 @@ export class Client extends BaseEntity {
      * API scope.
      */
     @Column({ type: 'varchar' })
-    public type: string;
+    public type: ClientType;
 
     /**
      * UUID of linked instance.
