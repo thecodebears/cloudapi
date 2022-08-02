@@ -1,5 +1,7 @@
 import 'dotenv/config';
 import * as path from "path";
+import { Account } from 'src/models/account.entity';
+import { BaseEntity } from 'src/models/base.entity';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 
 const config: Readonly<PostgresConnectionOptions> = {
@@ -15,7 +17,10 @@ const config: Readonly<PostgresConnectionOptions> = {
     logNotifications: true,
     applicationName: `cloudapi@${ process.env.hostname }`,
     migrations: [ path.join(__dirname, 'src/migration/*.ts') ],
-    entities: [ path.join(__dirname, 'dist/models/**/*.entity.js') ],
+    entities: [
+        BaseEntity,
+        Account
+    ],
     
     ...(process.env.useSSL === ('true' || true) && {
         ssl: {
