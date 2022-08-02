@@ -108,6 +108,8 @@ export class AuthController {
 
                 return { error: 'NotImplemented' };
             }
+
+            this.authService.closeAuthSession(sessionKey);
         } else if (authSession === AuthResponse.AuthSessionNotExists) {
             return { error: authSession };
         }
