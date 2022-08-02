@@ -7,5 +7,6 @@ export enum ClientResponse {
     /**
      * Error responses.
      */
-    NotFound='NotFound'
+    NotFound='NotFound',
+    Unauthorized='Unauthorized'
 }
