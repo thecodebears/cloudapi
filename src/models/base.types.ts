@@ -3,7 +3,7 @@ import { DeepPartial } from 'typeorm';
 /**
  * Entity rows.
  */
-export type Rows<T> = DeepPartial<T>;
+export type Columns<T> = DeepPartial<T>;
 
 /**
  * Response codes.
