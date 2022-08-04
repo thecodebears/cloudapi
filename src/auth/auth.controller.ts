@@ -2,35 +2,18 @@ import axios from 'axios';
 import * as url from 'url';
 import { Controller, Get, Query, Response } from '@nestjs/common';
 import { config } from 'config';
-import { ClientService } from 'src/models/client/client.service';
-import { UserService } from 'src/models/user/user.service';
-import { AuthService, AuthSession } from './auth.service';
-import { AuthResponse } from './auth.codes';
-import { UsersFindQuery } from 'src/models/user/user.types';
-import { User } from 'src/models/user/user.entity';
-import { Client } from 'src/models/client/client.entity';
-import { Security } from 'src/utils/security';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
     constructor(
-        private authService: AuthService,
-        private userService: UserService,
-        private clientService: ClientService
+        private authService: AuthService
     ) {}
 
-    private async createUserClient(user: User): Promise<Client> {
-        let client = await this.clientService.create('user', user.id);
-        await this.userService.loginClient({ id: user.id }, client);
-
-        return client;
-    }
-
-    private async destroyUserClient(user: User, client: Client) {
-        await this.clientService.destroy({ id: client.id });
-        await this.userService.logoutClient({ id: user.id }, client);
-    }
-
+    /**
+     * Discord strategy authorization.
+     * Gets full user data.
+     */
     @Get('discord')
     public async discord(@Response({ passthrough: true }) res, @Query('code') code: string) {
         let { applicationClientId, applicationClientSecret, applicationRedirectURL } = config.integrations.discord;
@@ -64,54 +47,12 @@ export class AuthController {
                     }
                 );
 
-                let authSession = this.authService.createAuthSession('discord', userRequest.data);
-    
-                res.redirect(`${ config.hostname }/auth?sessionKey=${ authSession }`);
+                return userRequest.data;
             } catch(e) {
                 console.log(e);
             }
         } else {
             res.redirect(`https://discord.com/api/oauth2/authorize?client_id=${ applicationClientId }&redirect_uri=${ encodeURIComponent(applicationRedirectURL) }&response_type=code&scope=identify`);
-        }
-    }
-
-    @Get()
-    public async register(
-        @Query('sessionKey') sessionKey: string,
-        @Query('username') username: string,
-        @Query('password') password: string
-    ) {
-        let authSession = this.authService.getAuthSession(sessionKey);
-
-        if (authSession instanceof AuthSession) {
-            if (authSession.type === 'discord') {
-                let user = await this.userService.findDiscordConnection(authSession.data.id);
-                let password;
-
-                if (!user) {
-                    password = Security.generateToken(authSession.data.username).slice(0, 8);
-                    user = await this.userService.create(authSession.data.username, password, authSession.data.id);
-                }
-
-                let client = await this.createUserClient(user);
-
-                return {
-                    token: client.token,
-                    username: user.username,
-                    ...(password && { password })
-                };
-            } else if (authSession.type === 'raw') {
-                /**
-                 * Not implemented.
-                 * TODO: Implement raw registration.
-                 */
-
-                return { error: 'NotImplemented' };
-            }
-
-            this.authService.closeAuthSession(sessionKey);
-        } else if (authSession === AuthResponse.AuthSessionNotExists) {
-            return { error: authSession };
         }
     }
 }
