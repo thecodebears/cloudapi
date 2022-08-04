@@ -1,10 +1,8 @@
 import 'dotenv/config';
 import * as path from "path";
-import { Client } from 'src/models/client/client.entity';
 import { BaseEntity } from 'src/models/base.entity';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { User } from 'src/models/user/user.entity';
-import { Application } from './src/models/application/application.entity';
 
 const config: Readonly<PostgresConnectionOptions> = {
     type: 'postgres',
@@ -21,9 +19,7 @@ const config: Readonly<PostgresConnectionOptions> = {
     migrations: [ path.join(__dirname, 'src/migration/*.ts') ],
     entities: [
         BaseEntity,
-        Client,
-        User,
-        Application
+        User
     ],
     
     ...(process.env.useSSL === ('true' || true) && {
