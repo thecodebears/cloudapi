@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Security } from "src/utils/security";
-import { AuthResponse } from "./auth.codes";
+import { AuthResponse } from "./auth.types";
 
 export class AuthSession {
     public key: string;
