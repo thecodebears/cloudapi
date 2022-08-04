@@ -20,16 +20,4 @@ export class User extends BaseEntity {
      */
     @Column({ type: 'boolean', nullable: true })
     public developer: boolean;
-
-    /**
-     * List of UUIDs of active clients.
-     */
-    @Column({ type: 'varchar', array: true })
-    public clients: string[];
-
-    /**
-     * Client access tokens of owned applications.
-     */
-    @Column({ type: 'varchar', array: true })
-    public applications: string[];
 }
