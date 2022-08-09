@@ -1,41 +1,52 @@
 import { Injectable } from "@nestjs/common";
-import { Security } from "src/utils/security";
-import { AuthResponse } from "./auth.types";
-
-export class AuthSession {
-    public key: string;
-    public type: 'discord' | 'raw';
-    public data: any;
-
-    constructor(key: string, type: AuthSession['type'], data: any) {
-        this.key = key;
-        this.type = type;
-        this.data = data;
-    }
-}
+import { UserService } from "src/models/user/user.service";
+import { APIResponse } from "src/types";
+import { CryptoService } from "src/utils/crypto.service";
+import { AuthResponse, UserAuthorizationData } from "./auth.types";
 
 @Injectable()
 export class AuthService {
-    private authSessions: AuthSession[] = [];
+    constructor(
+        private readonly cryptoService: CryptoService,
+        private readonly userService: UserService
+    ) {}
+    
+    async register(username: string, password: string): Promise<APIResponse<UserAuthorizationData>> {
+        if (await this.userService.findOneBy({ username })) return { error: AuthResponse.UsernameWasTaken };
 
-    public createAuthSession(type: AuthSession['type'], data: any): string {
-        let sessionKey = Security.generateToken(type);
-        this.authSessions.push(new AuthSession(sessionKey, type, data));
+        let passwordHash = this.cryptoService.hash(password);
+        let instance = await this.userService.create({
+            username,
+            password: passwordHash
+        });
 
-        return sessionKey;
+        let id = instance.id;
+        let token = this.cryptoService.createToken(
+            `${ id }@user`,
+            { scopes: [ '*' ] },
+            passwordHash
+        );
+
+        await this.userService.update({ id }, { token });
+
+        return { username, token };
     }
 
-    public getAuthSession(sessionKey: string): AuthSession | AuthResponse {
-        return this.authSessions.find(s => s.key === sessionKey) || AuthResponse.AuthSessionNotExists;
-    }
+    async login(username: string, password: string): Promise<APIResponse<UserAuthorizationData>> {
+        let instance = await this.userService.findOneBy({ username });
 
-    public closeAuthSession(sessionKey: string): AuthResponse {
-        if (!this.authSessions.find(s => s.key === sessionKey)) {
-            return AuthResponse.AuthSessionNotExists;
+        if (!instance) return { error: AuthResponse.UserNotFound };
+        
+        let passwordHash = this.cryptoService.hash(password);
+        let originalPasswordHash = instance.password;
+
+        if (passwordHash !== originalPasswordHash) {
+            return { error: AuthResponse.InvalidPassword };
         } else {
-            this.authSessions = this.authSessions.filter(k => k.key !== sessionKey);
-
-            return AuthResponse.AuthSessionClosed;
+            return {
+                username: instance.username,
+                token: instance.token
+            }
         }
     }
 }
