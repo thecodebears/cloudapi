@@ -10,8 +10,8 @@ export class EntityService<T extends ObjectLiteral> {
         return this.repository.save(user);
     }
 
-    public async destroy(findByRows: Columns<T>): Promise<EntityResponse> {
-        let user = await this.findOneBy(findByRows);
+    public async destroy(findByColumns: Columns<T>): Promise<EntityResponse> {
+        let user = await this.findOneBy(findByColumns);
         if (user) {
             await this.repository.remove(user);
 
@@ -21,15 +21,28 @@ export class EntityService<T extends ObjectLiteral> {
         }
     }
 
-    public async findBy(rows: Columns<T>): Promise<T[]> {
+    public async update(findByColumns: Columns<T>, updatedColumns: Columns<T>): Promise<EntityResponse> {
+        let user = await this.findOneBy(findByColumns);
+        if (user) {
+            Object.assign(user, updatedColumns);
+
+            await this.repository.save(user);
+
+            return EntityResponse.Updated;
+        } else {
+            return EntityResponse.NotFound;
+        }
+    }
+
+    public async findBy(columns: Columns<T>): Promise<T[]> {
         return this.repository.find({ where: 
-            Object.entries(rows).map(e => { return { [e[0]]: e[1] } })
+            Object.entries(columns).map(e => { return { [e[0]]: e[1] } })
         } as FindManyOptions<T>);
     }
 
-    public async findOneBy(rows: Columns<T>): Promise<T> {
+    public async findOneBy(columns: Columns<T>): Promise<T> {
         return this.repository.findOne({ where: 
-            Object.entries(rows).map(e => { return { [e[0]]: e[1] } })
+            Object.entries(columns).map(e => { return { [e[0]]: e[1] } })
         } as FindManyOptions<T>);
     }
 }
