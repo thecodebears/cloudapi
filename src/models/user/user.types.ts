@@ -1,7 +1,14 @@
 /**
- * Users finding parameters
+ * Response codes.
  */
-export type UsersFindQuery = {
-    id?: string,
-    username?: string
-};
+export enum UserResponse {
+    /**
+     * Success responses.
+     */
+
+
+    /**
+     * Error responses.
+     */
+
+}

@@ -1,7 +1,14 @@
 /**
- * Users finding parameters
+ * Response codes.
  */
-export type ApplicationsFindQuery = {
-    id?: string,
-    name?: string
+export enum ApplicationResponse {
+    /**
+     * Success responses.
+     */
+
+
+    /**
+     * Error responses.
+     */
+
 }
